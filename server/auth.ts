@@ -7,7 +7,7 @@ export const ADMIN_TOKEN = "cerebral-titan-admin-token-2024";
 export const requireAdmin = async (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
 
-  if (!authHeader || !authHeader.startsWith('Bearer ') || authHeader !== `Bearer ${ADMIN_TOKEN}`) {
+  if (authHeader !== `Bearer ${ADMIN_TOKEN}`) {
     return res.status(401).json({ message: "Unauthorized" });
   }
   next();

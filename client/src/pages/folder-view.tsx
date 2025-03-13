@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useRoute } from "wouter";
-import { Folder } from "@shared/schema";
+import { Note, Folder } from "@shared/schema";
 import { Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { FileText, FolderOpen } from "lucide-react";
@@ -20,7 +20,7 @@ export default function FolderView() {
     if (folder.path === targetPath) return folder;
     
     for (const child of folder.children) {
-      if ('children' in child) {
+      if ('path' in child) {
         const found = findFolder(child, targetPath);
         if (found) return found;
       }
@@ -39,7 +39,7 @@ export default function FolderView() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {currentFolder.children.map((item) => (
-          'children' in item ? (
+          'path' in item ? (
             // Folder
             <Card key={item.path}>
               <CardContent className="p-4">
@@ -54,10 +54,10 @@ export default function FolderView() {
             </Card>
           ) : (
             // Note
-            <Card key={item.path}>
+            <Card key={item.id}>
               <CardContent className="p-4">
                 <Link 
-                  href={`/notes/${item.path}`}
+                  href={`/notes/${item.id}`}
                   className="flex items-center hover:text-primary"
                 >
                   <FileText className="w-5 h-5 mr-2" />

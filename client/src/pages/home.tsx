@@ -32,13 +32,7 @@ export default function HomePage() {
           </div>
 
           <div className="grid gap-6">
-          {posts?.sort((a, b) => {
-              // Sort by title to put "Cerebral Titan" at the top
-              if (a.title.includes("Cerebral Titan")) return -1;
-              if (b.title.includes("Cerebral Titan")) return 1;
-              // Then sort by date
-              return new Date(b.publishedAt || Date.now()).getTime() - new Date(a.publishedAt || Date.now()).getTime();
-            }).map((post) => (
+            {posts?.map((post) => (
               <Card key={post.id} className="border-purple-200 dark:border-purple-900 hover:border-purple-400 transition-colors">
                 <CardHeader>
                   <div className="flex justify-between items-start">

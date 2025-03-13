@@ -139,9 +139,6 @@ export class MemStorage implements IStorage {
     const note: Note = {
       ...insertNote,
       id,
-      tags: insertNote.tags || null,
-      metadata: insertNote.metadata || null,
-      linkedNotes: insertNote.linkedNotes || null,
       createdAt: new Date()
     };
     this.notes.set(id, note);
@@ -229,10 +226,7 @@ export class MemStorage implements IStorage {
       ...insertPost,
       id,
       publishedAt: now,
-      updatedAt: now,
-      tags: insertPost.tags || null,
-      metadata: insertPost.metadata || null,
-      excerpt: insertPost.excerpt || null
+      updatedAt: now
     };
     this.posts.set(id, post);
     return post;
@@ -268,10 +262,10 @@ export class MemStorage implements IStorage {
     }
 
     if (options.tag) {
-      posts = posts.filter(post => post.tags?.includes(options.tag as string));
+      posts = posts.filter(post => post.tags.includes(options.tag));
     }
 
-    posts.sort((a, b) => (b.publishedAt?.getTime() ?? 0) - (a.publishedAt?.getTime() ?? 0));
+    posts.sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
 
     const offset = options.offset || 0;
     const limit = options.limit || posts.length;
@@ -289,11 +283,7 @@ export class MemStorage implements IStorage {
 
   async createCategory(insertCategory: InsertCategory): Promise<Category> {
     const id = this.currentCategoryId++;
-    const category: Category = { 
-      ...insertCategory, 
-      id,
-      description: insertCategory.description ?? null 
-    };
+    const category: Category = { ...insertCategory, id };
     this.categories.set(id, category);
     return category;
   }
@@ -310,7 +300,7 @@ export class MemStorage implements IStorage {
         post.content.toLowerCase().includes(lowercaseQuery) ||
         post.excerpt?.toLowerCase().includes(lowercaseQuery)
       )
-      .sort((a, b) => (b.publishedAt?.getTime() ?? 0) - (a.publishedAt?.getTime() ?? 0));
+      .sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
   }
 }
 

@@ -26,34 +26,17 @@ export default function PostEditor() {
       excerpt: "",
       category: "python-basics",
       tags: [],
-      metadata: {},
+      metadata: null,
     },
   });
 
   const mutation = useMutation({
     mutationFn: async (data: any) => {
-      const formattedData = {
-        ...data,
-        categoryId: parseInt(data.categoryId || "1"),
-        tags: Array.isArray(data.tags) ? data.tags : data.tags ? [data.tags] : [],
-        metadata: data.metadata || {}
-      };
-      
-      console.log("Submitting post data:", formattedData);
-      
-      const response = await fetch("/api/posts", {
-        method: "POST",
+      return apiRequest("POST", "/api/posts", data, {
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${ADMIN_TOKEN}`,
         },
-        body: JSON.stringify(formattedData),
       });
-      
-      if (!response.ok) {
-        throw new Error("Failed to create post");
-      }
-      return response;
     },
     onSuccess: () => {
       toast({
@@ -62,25 +45,24 @@ export default function PostEditor() {
       });
       setLocation("/");
     },
-    onError: (error: any) => {
-      console.error("Post creation error:", error);
+    onError: () => {
       toast({
         title: "Error",
-        description: `Failed to create post: ${error?.message || "Please check your post data."}`,
+        description: "Failed to create post. Make sure you have admin access.",
         variant: "destructive",
       });
-    }
-  });
-
-  const onSubmit = form.handleSubmit((data) => {
-    mutation.mutate(data);
+    },
   });
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="max-w-2xl mx-auto">
+    <div className="container mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-4xl font-mono font-bold bg-gradient-to-r from-violet-400 to-fuchsia-500 bg-clip-text text-transparent mb-8">
+          ✍️ Create New Post
+        </h1>
+
         <Form {...form}>
-          <form onSubmit={onSubmit} className="space-y-4">
+          <form onSubmit={form.handleSubmit((data) => mutation.mutate(data))} className="space-y-6">
             <FormField
               control={form.control}
               name="title"

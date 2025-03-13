@@ -1,19 +1,16 @@
 import { useForm } from "react-hook-form";
 import { useAuth } from "@/lib/auth";
-import { useLocation, useNavigate } from "react-router-dom"; // Assuming react-router-dom is used
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from 'react';
-
 
 export default function LoginPage() {
   const { login } = useAuth();
-  const navigate = useNavigate(); // Use useNavigate for routing
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const [error, setError] = useState<string | null>(null);
-
+  
   const form = useForm({
     defaultValues: {
       username: "",
@@ -22,26 +19,19 @@ export default function LoginPage() {
   });
 
   const onSubmit = async (data: { username: string; password: string }) => {
-    setError(null); // Clear previous errors
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
+      await login(data.username, data.password);
+      toast({
+        title: "Success",
+        description: "Logged in successfully",
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Login failed');
-      }
-
-      const { token } = await response.json();
-      localStorage.setItem('adminToken', token);
-      navigate('/admin'); // Redirect to /admin
-    } catch (err: any) {
-      setError(err.message);
+      setLocation("/");
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Invalid credentials",
+        variant: "destructive",
+      });
     }
   };
 
@@ -55,7 +45,6 @@ export default function LoginPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            {error && <p className="text-red-500">{error}</p>} {/* Display error message */}
             <div>
               <Input
                 {...form.register("username")}
@@ -80,4 +69,3 @@ export default function LoginPage() {
     </div>
   );
 }
-

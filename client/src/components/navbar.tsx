@@ -80,6 +80,7 @@ export default function Navbar() {
                 <Search className="h-5 w-5" />
               </Button>
             </Link>
+
             <Link href="/admin/post">
               <Button 
                 size="icon"

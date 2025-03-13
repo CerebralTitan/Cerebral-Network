@@ -1,21 +1,17 @@
 import { marked } from "marked";
-import type { Renderer } from "marked";
-
-type Link = Parameters<Renderer["link"]>[0];
-type Code = Parameters<Renderer["code"]>[0];
-type Heading = Parameters<Renderer["heading"]>[0];
 
 // Configure marked options
 marked.setOptions({
   breaks: true,
   gfm: true,
+  headerPrefix: "section-",
 });
 
 // Custom renderer to handle internal links and enhanced styling
 const renderer = new marked.Renderer();
 
 // Handle Obsidian-style wiki links [[note-name]]
-renderer.link = ({ href, title, text }: Link) => {
+renderer.link = (href, title, text) => {
   if (href?.startsWith("[[") && href.endsWith("]]")) {
     const slug = href.slice(2, -2).toLowerCase().replace(/\s+/g, "-");
     return `<a href="/posts/${slug}" class="internal-link font-mono text-purple-500 hover:text-pink-500 border-b border-dashed border-purple-500 hover:border-pink-500 transition-colors">${text || href.slice(2, -2)}</a>`;
@@ -24,7 +20,7 @@ renderer.link = ({ href, title, text }: Link) => {
 };
 
 // Enhanced code block styling with copy button
-renderer.code = ({ text: code, lang: language }: Code) => {
+renderer.code = (code, language) => {
   return `<div class="relative group">
     <pre class="bg-gray-900 rounded-lg p-4 overflow-x-auto font-mono text-sm">
       <code class="language-${language || 'text'}">${code}</code>
@@ -44,7 +40,7 @@ renderer.blockquote = (quote) => {
 };
 
 // Custom heading styling
-renderer.heading = ({ text, depth: level }: Heading) => {
+renderer.heading = (text, level) => {
   const classes = [
     "font-mono font-bold tracking-tight",
     level === 1 ? "text-4xl mb-6" : "",
@@ -61,8 +57,8 @@ renderer.heading = ({ text, depth: level }: Heading) => {
 
 marked.use({ renderer });
 
-export async function renderMarkdown(content: string): Promise<string> {
-  return await marked(content);
+export function renderMarkdown(content: string): string {
+  return marked(content);
 }
 
 // Extract all wiki-style links from content
